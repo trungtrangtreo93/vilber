@@ -1,7 +1,9 @@
-package trunggiaothuy.vilber;
+package trunggiaothuy.vilber.activity;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+
+import trunggiaothuy.vilber.R;
 
 public class MainActivity extends AppCompatActivity {
 
