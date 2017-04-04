@@ -23,6 +23,7 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.ipaulpro.afilechooser.utils.FileUtils;
 import com.yinglan.keyboard.HideUtil;
 
 import java.io.File;
@@ -39,6 +40,7 @@ import trunggiaothuy.vilber.model.PathStorage;
 public class DetailChatActivity extends BaseActivity {
 
     private static final String TAG = DetailChatActivity.class.getSimpleName();
+    private static final int REQUEST_CHOOSER = 100;
     private ImageView imgEmoji;
     private EmojIconActions emojIcon;
     private View rootView;
@@ -48,7 +50,6 @@ public class DetailChatActivity extends BaseActivity {
     private ImageAdapter adapter;
     private ArrayList<PathStorage> list = new ArrayList<>();
     private int count = 0;
-    private int PICKFILE_REQUEST_CODE = 100;
 
     //
     @Override
@@ -99,9 +100,10 @@ public class DetailChatActivity extends BaseActivity {
                 imgFile.setImageResource(R.drawable.ic_attach_file_select);
                 imgAudio.setImageResource(R.drawable.ic_settings_voice);
                 //
-                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                intent.setType("file/*");
-                startActivityForResult(intent, PICKFILE_REQUEST_CODE);
+                Intent getContentIntent = FileUtils.createGetContentIntent();
+
+                Intent intent = Intent.createChooser(getContentIntent, "Select a file");
+                startActivityForResult(intent, REQUEST_CHOOSER);
             }
         });
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -173,13 +175,30 @@ public class DetailChatActivity extends BaseActivity {
     }
 
     @Override
-    public void onActivityReenter(int resultCode, Intent data) {
-        super.onActivityReenter(resultCode, data);
-        if (resultCode == PICKFILE_REQUEST_CODE) {
-            Toast.makeText(this, "call", Toast.LENGTH_SHORT).show();
-            if (resultCode == Activity.RESULT_OK) {
-                Log.e(TAG, data.getDataString().toString());
-            }
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case REQUEST_CHOOSER:
+                if (resultCode == RESULT_OK) {
+
+                    final Uri uri = data.getData();
+                    // Get the File path from the Uri
+                    String path = FileUtils.getPath(this, uri);
+                    if (path != null && FileUtils.isLocal(path)) {
+                        File file = new File(path);
+                        double bytes = file.length();
+                        double kilobytes = (bytes / 1024);
+                        double megabytes = (kilobytes / 1024);
+                        if (megabytes > 3) {
+                            Toast.makeText(this, file.getName() + " vượt quá 3MB.", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(this, "Upload File", Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        Toast.makeText(this, "Error! Not get File", Toast.LENGTH_SHORT).show();
+                    }
+                }
+                break;
         }
     }
 
@@ -216,7 +235,6 @@ public class DetailChatActivity extends BaseActivity {
 
                     if (imagePath.isDirectory()) {
                         imageList = imagePath.listFiles();
-
                     }
                     if (imagePath.getName().contains(".jpg") || imagePath.getName().contains(".JPG")
                             || imagePath.getName().contains(".jpeg") || imagePath.getName().contains(".JPEG")
