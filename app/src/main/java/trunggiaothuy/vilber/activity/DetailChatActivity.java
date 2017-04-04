@@ -38,7 +38,6 @@ import trunggiaothuy.vilber.model.PathStorage;
 
 public class DetailChatActivity extends BaseActivity {
 
-
     private static final String TAG = DetailChatActivity.class.getSimpleName();
     private ImageView imgEmoji;
     private EmojIconActions emojIcon;
