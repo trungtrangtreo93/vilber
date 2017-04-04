@@ -1,7 +1,10 @@
 package trunggiaothuy.vilber.activity;
 
 import android.Manifest;
+import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
@@ -14,6 +17,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.webkit.MimeTypeMap;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -32,7 +36,7 @@ import trunggiaothuy.vilber.R;
 import trunggiaothuy.vilber.adapter.ImageAdapter;
 import trunggiaothuy.vilber.model.PathStorage;
 
-public class DetailChatActivity extends AppCompatActivity {
+public class DetailChatActivity extends BaseActivity {
 
 
     private static final String TAG = DetailChatActivity.class.getSimpleName();
@@ -45,6 +49,7 @@ public class DetailChatActivity extends AppCompatActivity {
     private ImageAdapter adapter;
     private ArrayList<PathStorage> list = new ArrayList<>();
     private int count = 0;
+    private int PICKFILE_REQUEST_CODE = 100;
 
     //
     @Override
@@ -53,8 +58,6 @@ public class DetailChatActivity extends AppCompatActivity {
         setContentView(R.layout.activity_detail_chat);
         HideUtil.init(this);
         init();
-        isStoragePermissionGranted();
-        rootView = findViewById(R.id.root_view);
         emojIcon = new EmojIconActions(this, rootView, emojiconEditText, imgEmoji);
         emojIcon.ShowEmojIcon();
         emojIcon.setIconsIds(R.drawable.ic_action_keyboard, R.drawable.ic_insert_emoticon);
@@ -62,11 +65,11 @@ public class DetailChatActivity extends AppCompatActivity {
             @Override
             public void onKeyboardOpen() {
                 Log.e(TAG, "Keyboard opened!");
-                emojIcon.setIconsIds(R.drawable.ic_action_keyboard, R.drawable.ic_emoji_select);
+                imgEmoji.setImageResource(R.drawable.ic_emoji_select);
                 imgGalery.setImageResource(R.drawable.ic_image);
                 imgFile.setImageResource(R.drawable.ic_attach_file);
                 imgAudio.setImageResource(R.drawable.ic_settings_voice);
-                gridView.setVisibility(View.GONE);
+                slideToBottom(gridView);
             }
 
             @Override
@@ -83,10 +86,23 @@ public class DetailChatActivity extends AppCompatActivity {
                 imgGalery.setImageResource(R.drawable.ic_image_select);
                 imgFile.setImageResource(R.drawable.ic_attach_file);
                 imgAudio.setImageResource(R.drawable.ic_settings_voice);
-                gridView.setVisibility(View.VISIBLE);
+                slideToTop(gridView);
                 adapter = new ImageAdapter(DetailChatActivity.this, list);
                 gridView.setAdapter(adapter);
 
+            }
+        });
+        imgFile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                imgEmoji.setImageResource(R.drawable.ic_insert_emoticon);
+                imgGalery.setImageResource(R.drawable.ic_image);
+                imgFile.setImageResource(R.drawable.ic_attach_file_select);
+                imgAudio.setImageResource(R.drawable.ic_settings_voice);
+                //
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.setType("file/*");
+                startActivityForResult(intent, PICKFILE_REQUEST_CODE);
             }
         });
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -132,26 +148,9 @@ public class DetailChatActivity extends AppCompatActivity {
         imgFile = (ImageView) findViewById(R.id.imgFile);
         rootView = findViewById(R.id.llEdt);
         emojiconEditText = (EmojiconEditText) findViewById(R.id.emojicon_edit_text);
-        getFilePaths();
+        rootView = findViewById(R.id.root_view);
         //init data from sd card
-    }
-
-    public boolean isStoragePermissionGranted() {
-        if (Build.VERSION.SDK_INT >= 23) {
-            if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                    == PackageManager.PERMISSION_GRANTED) {
-                Log.v(TAG, "Permission is granted");
-                return true;
-            } else {
-
-                Log.v(TAG, "Permission is revoked");
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
-                return false;
-            }
-        } else { //permission is automatically granted on sdk<23 upon installation
-            Log.v(TAG, "Permission is granted");
-            return true;
-        }
+        getFilePaths();
     }
 
     @Override
@@ -171,8 +170,17 @@ public class DetailChatActivity extends AppCompatActivity {
 
         if (imm.isAcceptingText()) {
             imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
-        } else {
-            Toast.makeText(this, "aaa", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onActivityReenter(int resultCode, Intent data) {
+        super.onActivityReenter(resultCode, data);
+        if (resultCode == PICKFILE_REQUEST_CODE) {
+            Toast.makeText(this, "call", Toast.LENGTH_SHORT).show();
+            if (resultCode == Activity.RESULT_OK) {
+                Log.e(TAG, data.getDataString().toString());
+            }
         }
     }
 

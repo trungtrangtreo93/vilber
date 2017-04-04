@@ -100,9 +100,9 @@
             android:id="@+id/gridView"
             android:layout_width="match_parent"
             android:layout_height="200dp"
-            android:horizontalSpacing="2dp"
+            android:layout_marginLeft="5dp"
             android:numColumns="3"
-            android:verticalSpacing="5dp"
+            android:verticalSpacing="20dp"
             android:visibility="gone" />
     </LinearLayout>
 
