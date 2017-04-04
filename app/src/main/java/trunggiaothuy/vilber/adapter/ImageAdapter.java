@@ -1,18 +1,12 @@
 package trunggiaothuy.vilber.adapter;
 
-import android.app.Activity;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.GridView;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
@@ -21,6 +15,7 @@ import java.io.File;
 import java.util.ArrayList;
 
 import trunggiaothuy.vilber.R;
+import trunggiaothuy.vilber.model.PathStorage;
 
 /**
  * Created by HUNGVIET on 03/04/2017.
@@ -29,11 +24,11 @@ import trunggiaothuy.vilber.R;
 public class ImageAdapter extends BaseAdapter {
     private static final String TAG = "ImageAdapter";
     private Context context;
-    private ArrayList<String> list;
+    private ArrayList<PathStorage> list;
     private ImageLoader imageLoader;
     private static LayoutInflater inflater = null;
 
-    public ImageAdapter(Context context, ArrayList<String> list) {
+    public ImageAdapter(Context context, ArrayList<PathStorage> list) {
         this.context = context;
         this.list = list;
         imageLoader = ImageLoader.getInstance();
@@ -59,11 +54,17 @@ public class ImageAdapter extends BaseAdapter {
         if (convertView == null)
             vi = inflater.inflate(R.layout.gridview_item, parent, false);
         ImageView image = (ImageView) vi.findViewById(R.id.image);
-
-        String decodedImgUri = Uri.fromFile(new File(list.get(position))).toString();
+        ImageView imageCheck = (ImageView) vi.findViewById(R.id.imageCheck);
+        if (list.get(position).isClick()) {
+            imageCheck.setVisibility(View.VISIBLE);
+            image.setAlpha(0.5f);
+        } else {
+            imageCheck.setVisibility(View.GONE);
+            image.setAlpha(1f);
+        }
+        String decodedImgUri = Uri.fromFile(new File(list.get(position).getUri())).toString();
 
         imageLoader.displayImage(decodedImgUri, image);
-        Log.e(TAG, list.get(position));
         return vi;
     }
 }

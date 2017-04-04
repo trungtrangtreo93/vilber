@@ -1,21 +1,20 @@
 package trunggiaothuy.vilber.activity;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Environment;
+import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -31,6 +30,7 @@ import hani.momanii.supernova_emoji_library.Actions.EmojIconActions;
 import hani.momanii.supernova_emoji_library.Helper.EmojiconEditText;
 import trunggiaothuy.vilber.R;
 import trunggiaothuy.vilber.adapter.ImageAdapter;
+import trunggiaothuy.vilber.model.PathStorage;
 
 public class DetailChatActivity extends AppCompatActivity {
 
@@ -40,15 +40,13 @@ public class DetailChatActivity extends AppCompatActivity {
     private EmojIconActions emojIcon;
     private View rootView;
     private EmojiconEditText emojiconEditText;
-    private ImageView imgGalery;
+    private ImageView imgGalery, imgFile, imgAudio;
     private GridView gridView;
     private ImageAdapter adapter;
-    //
-    private String[] FilePathStrings;
-    private String[] FileNameStrings;
-    private File[] listFile;
-    private File file;
+    private ArrayList<PathStorage> list = new ArrayList<>();
+    private int count = 0;
 
+    //
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,6 +62,11 @@ public class DetailChatActivity extends AppCompatActivity {
             @Override
             public void onKeyboardOpen() {
                 Log.e(TAG, "Keyboard opened!");
+                emojIcon.setIconsIds(R.drawable.ic_action_keyboard, R.drawable.ic_emoji_select);
+                imgGalery.setImageResource(R.drawable.ic_image);
+                imgFile.setImageResource(R.drawable.ic_attach_file);
+                imgAudio.setImageResource(R.drawable.ic_settings_voice);
+                gridView.setVisibility(View.GONE);
             }
 
             @Override
@@ -71,25 +74,65 @@ public class DetailChatActivity extends AppCompatActivity {
                 Log.e(TAG, "Keyboard closed");
             }
         });
+
         imgGalery.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                closeKeyboard();
+                imgEmoji.setImageResource(R.drawable.ic_insert_emoticon);
+                imgGalery.setImageResource(R.drawable.ic_image_select);
+                imgFile.setImageResource(R.drawable.ic_attach_file);
+                imgAudio.setImageResource(R.drawable.ic_settings_voice);
                 gridView.setVisibility(View.VISIBLE);
-                adapter = new ImageAdapter(DetailChatActivity.this, getFilePaths());
-                // Set the LazyAdapter to the GridView
+                adapter = new ImageAdapter(DetailChatActivity.this, list);
                 gridView.setAdapter(adapter);
 
             }
         });
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+                if (count >= 10) {
+                    if (list.get(i).isClick()) {
+                        list.get(i).setClick(false);
+                        count--;
+                    } else
+                        Toast.makeText(DetailChatActivity.this, "Bạn chỉ dc upload 10 ảnh", Toast.LENGTH_SHORT).show();
+
+                } else {
+                    if (list.get(i).isClick()) {
+                        list.get(i).setClick(false);
+                        count--;
+                    } else {
+                        list.get(i).setClick(true);
+                        count++;
+                    }
+                }
+                adapter.notifyDataSetChanged();
+
+
+            }
+        });
+    }
+
+    private void closeKeyboard() {
+        View view = this.getCurrentFocus();
+        if (view != null) {
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
     }
 
     private void init() {
         imgEmoji = (ImageView) findViewById(R.id.imgEmoji);
         imgGalery = (ImageView) findViewById(R.id.imgGalery);
         gridView = (GridView) findViewById(R.id.gridView);
+        imgAudio = (ImageView) findViewById(R.id.imgAudio);
+        imgFile = (ImageView) findViewById(R.id.imgFile);
         rootView = findViewById(R.id.llEdt);
         emojiconEditText = (EmojiconEditText) findViewById(R.id.emojicon_edit_text);
-
+        getFilePaths();
         //init data from sd card
     }
 
@@ -133,18 +176,12 @@ public class DetailChatActivity extends AppCompatActivity {
         }
     }
 
-    public void hideKeyboard(Context context, View view) {
-        InputMethodManager imm = (InputMethodManager) context.getSystemService(Activity.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-
-    }
-
-    public ArrayList<String> getFilePaths() {
+    public ArrayList<PathStorage> getFilePaths() {
         Uri u = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
         String[] projection = {MediaStore.Images.ImageColumns.DATA};
         Cursor c = null;
         SortedSet<String> dirList = new TreeSet<String>();
-        ArrayList<String> resultIAV = new ArrayList<String>();
+        list = new ArrayList<PathStorage>();
         String[] directories = null;
         if (u != null) {
             c = managedQuery(u, projection, null, null, null);
@@ -181,7 +218,7 @@ public class DetailChatActivity extends AppCompatActivity {
                             || imagePath.getName().contains(".bmp") || imagePath.getName().contains(".BMP")
                             ) {
                         String path = imagePath.getAbsolutePath();
-                        resultIAV.add(path);
+                        list.add(new PathStorage(path, false));
                     }
                 }
                 //  }
@@ -190,6 +227,6 @@ public class DetailChatActivity extends AppCompatActivity {
                 }
             }
         }
-        return resultIAV;
+        return list;
     }
 }

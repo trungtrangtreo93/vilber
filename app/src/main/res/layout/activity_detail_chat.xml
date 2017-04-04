@@ -22,80 +22,89 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:orientation="horizontal"
-        android:weightSum="2">
+        android:orientation="vertical">
 
         <LinearLayout
-            android:id="@+id/llEdt"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1.8"
-            android:orientation="vertical">
-
-            <hani.momanii.supernova_emoji_library.Helper.EmojiconEditText
-                android:id="@+id/emojicon_edit_text"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@null"
-                android:padding="10dp"
-                emojicon:emojiconSize="28sp" />
+            android:orientation="horizontal"
+            android:weightSum="2">
 
             <LinearLayout
-                android:id="@+id/llIcon"
-                android:layout_width="match_parent"
+                android:id="@+id/llEdt"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:paddingBottom="10dp">
+                android:layout_weight="1.8"
+                android:orientation="vertical">
 
-                <ImageView
-                    android:id="@+id/imgEmoji"
-                    android:layout_width="0dp"
+                <hani.momanii.supernova_emoji_library.Helper.EmojiconEditText
+                    android:id="@+id/emojicon_edit_text"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    app:srcCompat="@drawable/ic_insert_emoticon" />
+                    android:background="@null"
+                    android:padding="10dp"
+                    emojicon:emojiconSize="28sp" />
 
-                <ImageView
-                    android:id="@+id/imgGalery"
-                    android:layout_width="0dp"
+                <LinearLayout
+                    android:id="@+id/llIcon"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    app:srcCompat="@drawable/ic_image" />
+                    android:orientation="horizontal"
+                    android:paddingBottom="10dp">
 
-                <ImageView
-                    android:id="@+id/imgFile"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    app:srcCompat="@drawable/ic_attach_file" />
+                    <ImageView
+                        android:id="@+id/imgEmoji"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        app:srcCompat="@drawable/ic_insert_emoticon" />
 
-                <ImageView
-                    android:id="@+id/imgAudio"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    app:srcCompat="@drawable/ic_settings_voice" />
+                    <ImageView
+                        android:id="@+id/imgGalery"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        app:srcCompat="@drawable/ic_image" />
+
+                    <ImageView
+                        android:id="@+id/imgFile"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        app:srcCompat="@drawable/ic_attach_file" />
+
+                    <ImageView
+                        android:id="@+id/imgAudio"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        app:srcCompat="@drawable/ic_settings_voice" />
+
+                </LinearLayout>
+
 
             </LinearLayout>
 
-            <GridView
-                android:id="@+id/gridView"
-                android:layout_width="match_parent"
-                android:layout_height="200dp"
-                android:horizontalSpacing="2dp"
-                android:numColumns="3"
-                android:verticalSpacing="5dp"
-                android:visibility="gone" />
+            <ImageView
+                android:id="@+id/imgSend"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_toRightOf="@+id/llEdt"
+                android:layout_weight="0.2"
+                android:paddingRight="5dp"
+                app:srcCompat="@drawable/ic_send" />
         </LinearLayout>
 
-
-        <ImageView
-            android:id="@+id/imgSend"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_toRightOf="@+id/llEdt"
-            android:layout_weight="0.2"
-            android:paddingRight="5dp"
-            app:srcCompat="@drawable/ic_send" />
+        <GridView
+            android:id="@+id/gridView"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:horizontalSpacing="2dp"
+            android:numColumns="3"
+            android:verticalSpacing="5dp"
+            android:visibility="gone" />
     </LinearLayout>
+
+
 </RelativeLayout>
